@@ -9,7 +9,7 @@ mongoose.set('strictPopulate', false);*/
 const productSchema = new mongoose.Schema(
   {
     categoryName: { type: String, ref: "Category", required: true },
-    collection: { type: String, required: true },
+    collectionName: { type: String, required: true },
     img: { type: String, required: true },
     price: { type: Number, required: true },
     inStock: { type: Boolean },

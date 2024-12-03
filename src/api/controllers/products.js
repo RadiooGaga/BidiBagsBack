@@ -59,7 +59,7 @@ const getProductsByCategoryName = async (req, res, next) => {
 // SUBIR PRODUCTO NUEVO
 const createProductCard = async (req, res, next) => {
   try {
-    const { categoryName, collection, price, inStock, description, details } = req.body;
+    const { categoryName, collectionName, price, inStock, description, details } = req.body;
     const file = req.file;
    
    //Verificar si inStock es un valor booleano
@@ -72,7 +72,7 @@ const createProductCard = async (req, res, next) => {
     // Crear un nuevo producto
     const newProduct = new Product({
       categoryName,
-      collection,
+      collectionName,
       img: file.path,  // Guarda la URL de la imagen en cloudinary
       price,
       inStock: inStockValue,  // Almacena el valor booleano
