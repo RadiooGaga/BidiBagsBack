@@ -135,57 +135,58 @@ const getUserById = async (req, res, next) => {
   
 
   
-  // ACTUALIZAR USUARIO
-  const updateUserById = async (req, res, next) => {
+// ACTUALIZAR USUARIO
+const updateUserById = async (req, res, next) => {
   try {
-      const { id } = req.params;
-      console.log(id, "ES EL ID")
-      // Buscar el usuario original
-      const oldUser = await User.findById(id);
-      
-      if (req.user.id.toString() !== id) {
-        return res.status(400).json("No puedes modificar a alguien que no seas tú mismo");
-      }
+    const { id } = req.params;
+    console.log(id, "ES EL ID");
 
-      if (!oldUser) {
-          return res.status(404).json("Usuario no encontrado");
-      }
+    // Buscar el usuario original
+    const oldUser = await User.findById(id).populate('favorites');
 
-      // crear nuevo user
-      const newUser = { ...req.body };
-      // Si la contraseña ha sido modificada, re-hacer el hash
-      if (newUser.password) {
-        newUser.password = await bcrypt.hash(newUser.password, 10);
-      }
+    // Verificar que el usuario que realiza la solicitud es el mismo que el que quiere modificar
+    if (req.user.id.toString() !== id) {
+      return res.status(400).json({ message: "No puedes modificar a alguien que no seas tú mismo" });
+    }
 
-         //buscar si había favoritos en el oldUser
-         const myFavoritesIndex = oldUser.favorites.indexOf(newUser.favorites[0]);
-         console.log('favoritos del old user', myFavoritesIndex);
-         
-         //para mis favoritos
-         if (myFavoritesIndex === -1) { // si el favorito no está en mis favoritos
-           newUser.favorites = [...oldUser.favorites, ...newUser.favorites];
-           console.log('favorito no encontrado, añadiendo\n', newUser)
-         } else {
-           oldUser.favorites.splice(myFavoritesIndex, 1);//si está el mismo, se quita.
-           newUser.favorites = oldUser.favorites;
-           console.log('favorito no encontrado, borrando\n', newUser)
-         }
+    // Verificar si el usuario existe
+    if (!oldUser) {
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
 
-      // Actualizar el usuario
-      const userUpdated = await User.findByIdAndUpdate(id, newUser, { new: true});
-      if (userUpdated) {
-        console.log("usuario actualizado");
-        return res.status(200).json({ user: userUpdated });
-      } else {
-        return res.status(404).json('No se pudo actualizar el usuario');
-      }
+    // Crear nuevo user con los datos enviados en el body de la solicitud
+    const newUser = { ...req.body };
+
+    // Si la contraseña ha sido modificada, re-hacer el hash
+    if (newUser.password) {
+      newUser.password = await bcrypt.hash(newUser.password, 10);
+    }
+
+    // Si se proporcionan nuevos favoritos, actualizarlos
+    if (Array.isArray(newUser.favorites)) {
+      // Crear un conjunto (set) de los favoritos antiguos y nuevos para evitar duplicados
+      const updatedFavorites = new Set([...oldUser.favorites, ...newUser.favorites]);
+
+      // Convertimos el set de vuelta a un array
+      newUser.favorites = [...updatedFavorites];
+      console.log('Favoritos actualizados:', newUser.favorites);
+    }
+
+    // Actualizar el usuario con los nuevos datos (incluyendo los favoritos modificados)
+    const userUpdated = await User.findByIdAndUpdate(id, newUser, { new: true }).populate('favorites');
+
+    if (userUpdated) {
+      console.log("Usuario actualizado");
+      return res.status(200).json({ user: userUpdated });
+    } else {
+      return res.status(404).json({ message: 'No se pudo actualizar el usuario' });
+    }
 
   } catch (error) {
-      console.log("no ha podido actualizarse el usuario", error);
-      return res.status(400).json("error");
+    console.error("No ha podido actualizarse el usuario", error);
+    return res.status(400).json({ message: "Error al actualizar el usuario" });
   }
-  };
+};
 
 
   
