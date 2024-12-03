@@ -158,6 +158,20 @@ const getUserById = async (req, res, next) => {
         newUser.password = await bcrypt.hash(newUser.password, 10);
       }
 
+         //buscar si había favoritos en el oldUser
+         const myFavoritesIndex = oldUser.favorites.indexOf(newUser.favorites[0]);
+         console.log('favoritos del old user', myFavoritesIndex);
+         
+         //para mis favoritos
+         if (myFavoritesIndex === -1) { // si el favorito no está en mis favoritos
+           newUser.favorites = [...oldUser.favorites, ...newUser.favorites];
+           console.log('favorito no encontrado, añadiendo\n', newUser)
+         } else {
+           oldUser.favorites.splice(myFavoritesIndex, 1);//si está el mismo, se quita.
+           newUser.favorites = oldUser.favorites;
+           console.log('favorito no encontrado, borrando\n', newUser)
+         }
+
       // Actualizar el usuario
       const userUpdated = await User.findByIdAndUpdate(id, newUser, { new: true});
       if (userUpdated) {
