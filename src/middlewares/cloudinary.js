@@ -20,6 +20,29 @@ const uploadImage = async (imgUrl) => {
 
 // Almacenar las fotos en Cloudinary
 const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: async (req, file) => {
+    let folderName = 'bidi-bags'; // Carpeta por defecto
+
+    // Lógica para determinar la carpeta
+    if (req.path.includes('bidi-bags')) {
+      folderName = 'bidi-bags';
+    } else if (req.path.includes('blog')) {
+      folderName = 'blog-posts';
+    } else if (req.path.includes('profile-pictures')) {
+      folderName = 'profile-pictures';
+    }
+
+    return {
+      folder: folderName,
+      allowed_formats: ['jpg', 'png', 'jpeg', 'gif'],
+      overwrite: true,
+      invalidate: true,
+    };
+  },
+});
+/*
+const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
       folder: 'bidi-bags',
@@ -27,7 +50,7 @@ const storage = new CloudinaryStorage({
       overwrite: true,
       invalidate: true 
     }
-  });
+  });*/
 
 // borrarlas de Cloudinary
 const deleteImgCloudinary = (imgUrl) => {

@@ -1,6 +1,5 @@
 
 const { isAdmin, isAuth } = require("../../middlewares/auth");
-const { upload } = require('../../middlewares/cloudinary')
 const userRoutes = require("express").Router();
 
 // ------------------ ACORDARSE DE ISAUTH [isAuth] para alguas funcionalidades ----------
@@ -10,7 +9,6 @@ const userRoutes = require("express").Router();
 const {
     register,
     login,
-    createBlogPost,
     getUsers,
     getUserById,
     updateUserById,
@@ -20,7 +18,6 @@ const {
 
 userRoutes.post("/register", register);
 userRoutes.post("/login", login);
-userRoutes.post("/create-post", upload.single('img'), createBlogPost);
 userRoutes.get("/users", [isAdmin], getUsers);
 userRoutes.get("/user/:id",[isAdmin], getUserById);
 userRoutes.put("/update-user/:id", [isAuth], updateUserById);

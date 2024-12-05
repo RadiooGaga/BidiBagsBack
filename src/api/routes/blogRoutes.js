@@ -4,11 +4,12 @@ const { upload } = require("../../middlewares/cloudinary");
 
 
 const { 
+    getAllPosts,
     createBlogPost,
-} = require("../controllers/blogpost");
+} = require("../controllers/blog");
 
 
 blogRoutes.post("/create-post", upload.single('img'), createBlogPost);
-
+blogRoutes.post("/blog", getAllPosts);
 
 module.exports =  blogRoutes;

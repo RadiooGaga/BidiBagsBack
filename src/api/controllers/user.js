@@ -1,6 +1,5 @@
 const { createToken } = require("../../utils/jsonWebToken");
 const User = require("../models/User");
-const Post = require('../models/BlogModel');
 const bcrypt = require("bcryptjs");
 
 
@@ -73,40 +72,6 @@ const login = async (req, res, next) => {
     }
   };
 
-
-
-
-
-// SUBIR POST NUEVO
-const createBlogPost = async (req, res, next) => {
-    try {
-      const { title, content, img } = req.body;
-      const file = req.file;
-
-      if (!file) {
-        return res.status(400).json({ message: 'Por favor, sube una imagen para el post' });
-      }
-       
-      // Crear un nuevo post en el blog
-      const newPost = new Post({
-        title,
-        content,
-        img: file.path,  // Guarda la URL de la imagen en cloudinary
-      });
-  
-      const postBlogDB = await newPost.save(); // Guardado del post en la base de datos
-      console.log('Post creado con éxito!');
-      return res.status(201).json({ 
-        post: postBlogDB, 
-        message: "ENTRADA SUBIDA!" });
-  
-    } catch (error) {
-      console.log("Error al crear el post:", error);
-      return res.status(500).json({ 
-        message: 'Hubo un error al crear el post', 
-        error: error.message });
-    }
-};
    
 
 // TRAER USUARIOS
@@ -223,7 +188,6 @@ const updateUserById = async (req, res, next) => {
   module.exports = {
       register,
       login,
-      createBlogPost,
       getUsers,
       getUserById,
       updateUserById,
@@ -232,46 +196,3 @@ const updateUserById = async (req, res, next) => {
   
   
   
-
-
- /*
-   // ACTUALIZAR USUARIO
-const updateUserById = async (req, res, next) => {
-  try {
-      const { id } = req.params;
-      
-      if (req.user._id.toString() !== id) {
-        return res.status(400).json("No puedes modificar a alguien que no seas tu mismo")
-      }
-      const oldUser = await User.findById(id) //buscar el user
-      const newUser = new User(req.body); // almacenar como newUser
-      //crear nuevo id del usuario nuevo, que es el mismo pero para el nuevo user.
-      newUser._id = id; 
-      
-      //buscar si había favoritos en el oldUser
-      const myFavoritesIndex = oldUser.myEvents.indexOf(newUser.myEvents[0]);
-      console.log('favoritos del old user', myFavoritesIndex);
-      
-      //para mis favoritos
-      if (myFavoritesIndex === -1) { // si el favorito no está en mis favoritos
-        newUser.favorites = [...oldUser.favorites, ...newUser.favorites];
-        console.log('favorito no encontrado, añadiendo\n', newUser)
-      } else {
-        oldUser.favorites.splice(myFavoritesIndex, 1);//si está el mismo, se quita.
-        newUser.favorites = oldUser.favorites;
-        console.log('favorito no encontrado, borrando\n', newUser)
-      }
-
-      const userUpdated = await User.findByIdAndUpdate(id, newUser, {
-        new: true,
-      });
-
-      console.log("usuario actualizado");
-      return res.status(200).json(userUpdated);
-  
-    } catch (error) {
-      console.log("no ha podido actualizarse el usuario");
-      return res.status(400).json("error");
-    }
-}
- */

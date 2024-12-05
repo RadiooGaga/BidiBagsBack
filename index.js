@@ -9,6 +9,7 @@ const cors = require('cors');
 const userRoutes = require('./src/api/routes/userRoutes');
 const productRoutes = require('./src/api/routes/productRoutes')
 const categoryRoutes = require('./src/api/routes/categoryRoutes');
+const blogRoutes = require('./src/api/routes/blogRoutes');
 
 
 const app = express();
@@ -32,14 +33,16 @@ connectDB();
 
 app.use(express.json()); 
 app.use(cors());
-/*
+
 app.use(cors({
-    origin: 'http://localhost:5173'
-  }));*/
+    origin: 'http://localhost:5173',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  }));
 
 app.use('/bidi-bags', userRoutes);
 app.use('/bidi-bags', productRoutes)
 app.use('/bidi-bags', categoryRoutes);
+app.use('/bidi-bags', blogRoutes);
 
 
 
