@@ -34,6 +34,7 @@ connectDB();
 app.use(express.json()); 
 app.use(cors());
 
+
 app.use(cors({
   origin: 'https://bidibagsback-production.up.railway.app',
     //origin: 'http://localhost:5173',
