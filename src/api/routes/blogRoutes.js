@@ -12,6 +12,6 @@ const {
 
 blogRoutes.post("/create-post", upload.single('img'), createBlogPost);
 blogRoutes.get("/latest-post", getLatestPost);
-blogRoutes.post("/blog", getAllPosts);
+blogRoutes.get("/blog", getAllPosts);
 
 module.exports =  blogRoutes;

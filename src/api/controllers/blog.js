@@ -12,11 +12,11 @@ const getAllPosts = async (req, res) => {
 
 const getLatestPost = async (req, res) => {
   try {
-    const latestPost = await Post.findOne().sort({ createdAt: -1 }); // Busca el más reciente
+    const latestPost = await Post.findOne({}).sort({ createdAt: -1 }); // Busca el más reciente
     if (!latestPost) {
       return res.status(404).json({ message: 'No se encontraron posts.' });
     }
-    res.status(200).json({ blog: latestPost });
+    res.status(200).json( latestPost );
   } catch (error) {
     console.error('Error al obtener el último post:', error);
     res.status(500).json({ message: 'Error al obtener el post.' });

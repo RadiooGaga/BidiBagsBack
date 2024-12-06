@@ -7,7 +7,7 @@ const uploadImage = async (imgUrl) => {
   try {
     const result = await cloudinary.uploader.upload(imgUrl, {
       folder: 'bidi-bags',
-      allowedFormats: ['jpg', 'png', 'jpeg', 'gif'],
+      allowedFormats: ['jpg', 'png', 'jpeg', 'gif', 'webp'],
       overwrite: true,
       invalidate: true  
     });
