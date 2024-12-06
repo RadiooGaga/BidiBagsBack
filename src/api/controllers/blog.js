@@ -9,6 +9,21 @@ const getAllPosts = async (req, res) => {
   }
 };
 
+
+const getLatestPost = async (req, res) => {
+  try {
+    const latestPost = await Post.findOne().sort({ createdAt: -1 }); // Busca el más reciente
+    if (!latestPost) {
+      return res.status(404).json({ message: 'No se encontraron posts.' });
+    }
+    res.status(200).json({ blog: latestPost });
+  } catch (error) {
+    console.error('Error al obtener el último post:', error);
+    res.status(500).json({ message: 'Error al obtener el post.' });
+  }
+};
+
+
 const createBlogPost = async (req, res, next) => {
     try {
       const { title, content } = req.body;
@@ -27,8 +42,10 @@ const createBlogPost = async (req, res, next) => {
       const postDB = await newPost.save();
       console.log('Post creado con éxito y guardado en la DB!!')
       return res.status(201).json({ 
-        blog: postDB, 
-        message: "POST SUBIDO!" });
+        post: postDB, 
+        message: "POST SUBIDO!", 
+        success: true 
+      });
       
     } catch (error) {
       console.log("error al crear el post");
@@ -36,4 +53,4 @@ const createBlogPost = async (req, res, next) => {
     }
 }
 
-module.exports = { getAllPosts, createBlogPost };
+module.exports = { getAllPosts, getLatestPost, createBlogPost };

@@ -39,10 +39,10 @@ app.use(cors({
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
   }));
 
-app.use('/bidi-bags', userRoutes);
-app.use('/bidi-bags', productRoutes)
-app.use('/bidi-bags', categoryRoutes);
-app.use('/bidi-bags', blogRoutes);
+app.use('/', userRoutes);
+app.use('/', productRoutes)
+app.use('/', categoryRoutes);
+app.use('/', blogRoutes);
 
 
 

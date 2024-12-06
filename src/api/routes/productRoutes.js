@@ -16,8 +16,8 @@ const {
 
 
 productRoutes.get("/products", getProducts);
-productRoutes.get("/product/:id", getProductById);
-productRoutes.get("/category/:categoryName", getProductsByCategoryName);
+productRoutes.get("/products/:id", getProductById);
+productRoutes.get("/products/category/:categoryName", getProductsByCategoryName);
 productRoutes.post("/create-product", upload.single('img'), createProductCard);
 
 
