@@ -83,7 +83,8 @@ const getUsers = async (req, res, next) => {
       return res.status(400).json(error);
     }
 };
-  
+
+
   
 // TRAER USUARIO POR ID
 const getUserById = async (req, res, next) => {

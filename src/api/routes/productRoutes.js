@@ -12,7 +12,7 @@ const {
     getProductsByCategoryName, 
     createProductCard 
 
-} = require('../controllers/products');
+} = require('../controllers/product');
 
 
 productRoutes.get("/products", getProducts);
