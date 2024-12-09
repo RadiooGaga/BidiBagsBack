@@ -23,4 +23,5 @@ userRoutes.get("/user/:id",[isAdmin], getUserById);
 userRoutes.put("/update-user/:id", [isAuth], updateUserById);
 userRoutes.delete("/delete-user/:id", [isAdmin], deleteUserById);
 
+
 module.exports = userRoutes;

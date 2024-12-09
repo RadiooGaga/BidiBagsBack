@@ -31,13 +31,11 @@ const getProductById = async (req, res, next) => {
 const getProductsByCategoryName = async (req, res, next) => {
     try {
       const { categoryName } = req.params;
-
       const cleanedCategory = categoryName.trim(); 
       const products = await Product.find({
-        categoryName: {
-          $regex: new RegExp(cleanedCategory, "i") // Búsqueda insensible a mayúsculas/minúsculas
-        }
-      });
+        categoryName: new RegExp(`^${cleanedCategory}$`, "i") 
+        // Coincidencia exacta e insensible a mayúsculas/minúsculas
+    });
 
       if (products.length < 0) {
         return res.status(404).json({ message: "No se encontraron productos para esta categoría" });
@@ -96,7 +94,33 @@ const createProductCard = async (req, res, next) => {
 
 
 
+const exportProductsToCsv = async (req, res) => {
+    try {
+        const products = await Product.find().lean();
 
-module.exports = { getProducts, getProductById, getProductsByCategoryName, createProductCard }
+        if (!products || products.length === 0) {
+          return res.status(404).send("No hay productos para exportar");
+        }
+
+      // Convertir los productos a formato CSV
+      const headers = Object.keys(products[0]).join(","); // Encabezados
+      const rows = products.map(product =>
+          Object.values(product).map(value => `"${value}"`).join(",")
+      ); // Filas de datos
+
+      const csvContent = [headers, ...rows].join("\n");
+
+      // Enviar el archivo CSV como respuesta
+      res.setHeader("Content-Disposition", "attachment; filename=productos.csv");
+      res.setHeader("Content-Type", "text/csv");
+      res.status(200).send(csvContent);
+  } catch (error) {
+      console.error("Error al exportar productos a CSV:", error);
+      res.status(500).send("Error al exportar productos");
+  }
+};
+
+
+module.exports = { getProducts, getProductById, getProductsByCategoryName, createProductCard, exportProductsToCsv }
   
   

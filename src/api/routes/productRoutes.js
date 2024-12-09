@@ -10,7 +10,8 @@ const {
     getProducts, 
     getProductById, 
     getProductsByCategoryName, 
-    createProductCard 
+    createProductCard,
+    exportProductsToCsv
 
 } = require('../controllers/product');
 
@@ -19,6 +20,7 @@ productRoutes.get("/products", getProducts);
 productRoutes.get("/products/:id", getProductById);
 productRoutes.get("/products/category/:categoryName", getProductsByCategoryName);
 productRoutes.post("/create-product", upload.single('img'), createProductCard);
+productRoutes.get('/products/export/csv', [isAdmin], exportProductsToCsv);
 
 
 module.exports = productRoutes;

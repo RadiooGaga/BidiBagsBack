@@ -40,7 +40,7 @@ const createCategory = async (req, res, next) => {
       const categoryDB = await newCategory.save();
       console.log('Categoría creada con éxito y guardada en la DB!!')
       return res.status(201).json({ 
-        category: categoryDB, 
+        categoryName: categoryDB, 
         message: "CATEGORÍA SUBIDA!" });
       
     } catch (error) {
