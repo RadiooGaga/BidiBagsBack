@@ -1,8 +1,5 @@
-
 const fs = require("fs");
 const { productsCard } = require("../config/seed");
-
-
 
 const writeAndReadFile = () => {
   fs.writeFile(

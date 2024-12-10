@@ -19,7 +19,30 @@ const userSchema = new mongoose.Schema(
      /* minlength: [8, 'Password 8 characters minimum'],*/
     },
     favorites: { type: [String], trim: true, required: true },
-    rol: { type: String, required: true, /*default: "user",*/ enum: ["admin", "user"]}
+    rol: { type: String, required: true, /*default: "user",*/ enum: ["admin", "user"]},
+
+    // Nuevos campos para dirección y forma de pago
+    shippingAddress: {
+      street: { type: String },
+      city: { type: String },
+      postalCode: { type: String },
+      country: { type: String },
+    },
+
+    billingAddress: {
+      street: { type: String },
+      city: { type: String },
+      postalCode: { type: String },
+      country: { type: String },
+    },
+
+    paymentMethods: [
+      {
+        paymentToken: { type: String }, 
+        // Token de pago proporcionado por el proveedor de pago (como Stripe)
+        cardHolderName: { type: String },
+      },
+    ],
   }, {
     timestamps: true,
     collection: "Users",

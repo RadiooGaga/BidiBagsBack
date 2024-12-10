@@ -12,7 +12,11 @@ const register = async (req, res, next) => {
         email: req.body.email,
         password: req.body.password,
         favorites: req.body.favorites,
-        rol: req.body.rol
+        rol: req.body.rol,
+        shippingAddress: req.body.shippingAddress,
+        billingAddress: req.body.billingAddress,
+        paymentMethods: req.body.paymentMethods
+   
     });
 
     const userExists = await User.findOne({ 

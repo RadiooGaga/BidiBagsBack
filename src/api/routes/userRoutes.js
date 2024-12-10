@@ -19,7 +19,7 @@ const {
 userRoutes.post("/register", register);
 userRoutes.post("/login", login);
 userRoutes.get("/users", [isAdmin], getUsers);
-userRoutes.get("/user/:id",[isAdmin], getUserById);
+userRoutes.get("/user/:id", getUserById);
 userRoutes.put("/update-user/:id", [isAuth], updateUserById);
 userRoutes.delete("/delete-user/:id", [isAdmin], deleteUserById);
 

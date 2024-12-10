@@ -1,11 +1,9 @@
 const User = require("../api/models/User");
 const { verifyToken } = require("../utils/jsonWebToken");
 
-
 //sólo el administrador con el rol "admin".
 const isAdmin = async (req, res, next) => {
-
-
+    
     try {
         const token = req.headers.authorization;
 
