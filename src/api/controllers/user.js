@@ -12,11 +12,7 @@ const register = async (req, res, next) => {
         email: req.body.email,
         password: req.body.password,
         favorites: req.body.favorites,
-        rol: req.body.rol,
-        shippingAddress: req.body.shippingAddress,
-        billingAddress: req.body.billingAddress,
-        paymentMethods: req.body.paymentMethods
-   
+        rol: "user",   
     });
 
     const userExists = await User.findOne({ 
@@ -43,6 +39,7 @@ const register = async (req, res, next) => {
       user });
 
   } catch (error) {
+    console.error('Error en el registro:', error); 
     return res.status(400).json("error");
   }
 };
@@ -96,6 +93,9 @@ const getUserById = async (req, res, next) => {
       const { id } = req.params;
       const user = await User.findById(id)
       .populate('favorites')
+      .populate('paymentMethods')  
+      .populate('shippingAddress') 
+      .populate('billingAddress')
       console.log(user)
       return res.status(200).json(user);
     } catch (error) {
@@ -105,6 +105,7 @@ const getUserById = async (req, res, next) => {
   
 
   
+
 // ACTUALIZAR USUARIO
 const updateUserById = async (req, res, next) => {
   try {
@@ -127,10 +128,12 @@ const updateUserById = async (req, res, next) => {
     // Crear nuevo user con los datos enviados en el body de la solicitud
     const newUser = { ...req.body };
 
+
     // Si la contraseña ha sido modificada, re-hacer el hash
     if (newUser.password) {
       newUser.password = await bcrypt.hash(newUser.password, 10);
     }
+
 
     // Si se proporcionan nuevos favoritos, actualizarlos
     if (Array.isArray(newUser.favorites)) {
@@ -142,8 +145,36 @@ const updateUserById = async (req, res, next) => {
       console.log('Favoritos actualizados:', newUser.favorites);
     }
 
+
+    // Actualizar favoritos si se proporcionan
+    if (Array.isArray(newUser.favorites)) {
+      newUser.favorites = newUser.favorites; // Usar los nuevos favoritos tal cual
+      console.log('Favoritos actualizados:', newUser.favorites);
+    }
+
+    // Actualizar direcciones de envío y facturación si se proporcionan
+    if (Array.isArray(newUser.shippingAddress)) {
+      newUser.shippingAddress = newUser.shippingAddress; // Usar las nuevas direcciones de envío
+      console.log('Dirección de envío actualizada:', newUser.shippingAddress);
+    }
+
+    if (Array.isArray(newUser.billingAddress)) {
+      newUser.billingAddress = newUser.billingAddress; // Usar las nuevas direcciones de facturación
+      console.log('Dirección de facturación actualizada:', newUser.billingAddress);
+    }
+
+    // Actualizar métodos de pago si se proporcionan
+    if (Array.isArray(newUser.paymentMethods)) {
+      newUser.paymentMethods = newUser.paymentMethods; // Usar los nuevos métodos de pago
+      console.log('Métodos de pago actualizados:', newUser.paymentMethods);
+    }
+
     // Actualizar el usuario con los nuevos datos (incluyendo los favoritos modificados)
-    const userUpdated = await User.findByIdAndUpdate(id, newUser, { new: true }).populate('favorites');
+    const userUpdated = await User.findByIdAndUpdate(id, newUser, { new: true })
+      .populate('favorites')
+      .populate('shippingAddress')
+      .populate('billingAddress')
+      .populate('paymentMethods')
 
     if (userUpdated) {
       console.log("Usuario actualizado");
