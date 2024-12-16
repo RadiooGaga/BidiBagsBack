@@ -103,10 +103,9 @@ const getUserById = async (req, res, next) => {
 
   
 // ACTUALIZAR USUARIO
-
 const updateUserById = async (req, res) => {
   try {
-    const { id } = req.params; // ID del usuario que deseas actualizar
+    const { id } = req.params; // ID del usuario a actualizar
     const updates = req.body; // Nuevos datos enviados en el body
     const { newPaymentMethod, shippingAddress, billingAddress } = updates; // Extraer campos específicos
 
@@ -127,14 +126,24 @@ const updateUserById = async (req, res) => {
       updates.password = await bcrypt.hash(updates.password, 10);
     }
 
-   // Si se proporcionan nuevos favoritos, actualizarlos
-   if (Array.isArray(updates.favorites)) {
-    // Crear un conjunto (set) de los favoritos antiguos y nuevos para evitar duplicados
-    const updatedFavorites = new Set([...oldUser.favorites, ...updates.favorites]);
-    // Convertimos el set de vuelta a un array
-    updates.favorites = [...updatedFavorites];
-    console.log('Favoritos actualizados:', updates.favorites);
-  }
+    //console.log("Body recibido en la solicitud:", updates);
+
+    
+    if (updates.favoritesToAdd || updates.favoritesToRemove) {
+      const favoritesToAdd = updates.favoritesToAdd || [];
+      const favoritesToRemove = updates.favoritesToRemove || [];
+
+      const updatedFavorites = oldUser.favorites
+        .filter((id) => !favoritesToRemove.includes(id.toString())) // Eliminar favoritos
+        .concat(favoritesToAdd.filter((id) => !oldUser.favorites.includes(id))); // Añadir nuevos sin duplicados
+
+        // Filtrar duplicados, en caso de que alguna lógica añada favoritos repetidos
+        const uniqueFavorites = [...new Set(updatedFavorites)];
+
+        updates.favorites = uniqueFavorites; //lista filtrada y sin duplicados
+      console.log('Favoritos actualizados:', uniqueFavorites);
+
+    }
 
     // Construir las operaciones de actualización
     const updateOperations = { $set: updates };
@@ -174,7 +183,7 @@ const updateUserById = async (req, res) => {
 };
 
 
-  //BORRAR USUARIO (ADMIN)
+//BORRAR USUARIO (ADMIN)
 const deleteUserById = async (req, res, next) => {
     try {
         const { id } = req.params;

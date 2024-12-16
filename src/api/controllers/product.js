@@ -18,7 +18,7 @@ const getProductById = async (req, res, next) => {
     try {
       const { id } = req.params;
       const product = await Product.findById(id);
-      console.log("id del producto", product);
+      console.log("id del producto", id);
       return res.status(200).json(product);
     } catch (error) {
       console.log(error, "no hemos encontrado el producto");
@@ -41,7 +41,7 @@ const getProductsByCategoryName = async (req, res, next) => {
         return res.status(404).json({ message: "No se encontraron productos para esta categoría" });
       }
 
-      console.log("tus productos por categoría", products);
+      console.log("tus productos por categoría");
       return res.status(200).json(products);
   
     } catch (error) {
