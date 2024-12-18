@@ -11,7 +11,9 @@ const {
     getProductById, 
     getProductsByCategoryName, 
     createProductCard,
-    exportProductsToCsv
+    exportProductsToCsv,
+    updateProductById,
+    deleteProduct
 
 } = require('../controllers/product');
 
@@ -21,6 +23,8 @@ productRoutes.get("/products/:id", getProductById);
 productRoutes.get("/products/category/:categoryName", getProductsByCategoryName);
 productRoutes.post("/create-product", upload.single('img'), createProductCard);
 productRoutes.get('/products/export/csv', [isAdmin], exportProductsToCsv);
+productRoutes.patch('/update-product/:id', upload.single('img'), updateProductById);
+productRoutes.delete('/delete-product/:id', deleteProduct);
 
 
 module.exports = productRoutes;

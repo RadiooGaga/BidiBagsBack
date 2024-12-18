@@ -7,17 +7,17 @@ const uploadImage = async (imgUrl) => {
   try {
     const result = await cloudinary.uploader.upload(imgUrl, {
       folder: 'bidi-bags',
-      allowedFormats: ['jpg', 'png', 'jpeg', 'gif', 'webp'],
+      allowedFormats: ['jpg', 'png', 'jpeg', 'gif'],
       overwrite: true,
       invalidate: true  
     });
-    return result;
+    return result.url;
   } catch (error) {
     throw new Error('Error uploading image: ' + error.message);
   }
 };
 
-
+/*
 // Almacenar las fotos en Cloudinary
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
@@ -40,8 +40,8 @@ const storage = new CloudinaryStorage({
       invalidate: true,
     };
   },
-});
-/*
+});*/
+
 const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
@@ -50,25 +50,31 @@ const storage = new CloudinaryStorage({
       overwrite: true,
       invalidate: true 
     }
-  });*/
+  });
 
-// borrarlas de Cloudinary
-const deleteImgCloudinary = (imgUrl) => {
-    // Dividir la URL para obtener el public_id
-    const imgSplited = imgUrl.split('/');
-    const nameSplited = imgSplited[imgSplited.length - 1].split('.');
-    const public_id = nameSplited[0];
-    const publicId = `bidi-bags/${public_id}`;
- 
-    // Localizamos publicId e imprimimos callback indicando que se ha podido eliminar.
-    cloudinary.uploader.destroy(publicId)
-    .then(result => {
-        console.log('Imagen eliminada:', result);
-      })
-      .catch(error => {
-        console.error('Error eliminando la imagen:', error);
-      });
-}
+
+// ELIMINAR IMÁGENES
+const deleteImgCloudinary = async (imgUrl) => {
+  if (!imgUrl) {
+    console.log('No se proporcionó una URL de imagen.');
+    return;
+  }
+
+  // Extrae el public_id desde la URL
+  const imgSplited = imgUrl.split('/');
+  const fileName = imgSplited[imgSplited.length - 1].split('.')[0];
+  const publicId = `bidi-bags/${fileName}`;
+
+  console.log("Public ID a eliminar:", publicId);
+
+  try {
+    const result = await cloudinary.uploader.destroy(publicId);
+    console.log('Imagen eliminada:', result);
+  } catch (error) {
+    console.error('Error eliminando la imagen:', error);
+  }
+};
+
 
 const upload = multer({ storage });
 module.exports = { upload, uploadImage, deleteImgCloudinary }

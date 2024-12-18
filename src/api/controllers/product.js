@@ -1,3 +1,5 @@
+const { deleteImgCloudinary } = require('../../middlewares/cloudinary');
+const cloudinary = require('cloudinary').v2
 const Product = require('../models/Product');
 
 // TRAER PRODUCTOS
@@ -49,8 +51,6 @@ const getProductsByCategoryName = async (req, res, next) => {
       return res.status(500).json({ message: "Error interno del servidor" });
     }
 }
-
-
 
 
 
@@ -120,7 +120,96 @@ const exportProductsToCsv = async (req, res) => {
   }
 };
 
+// ACTUALIZAR EL PRODUCTO
+const updateProductById = async (req, res, next) => {
+  try {
 
-module.exports = { getProducts, getProductById, getProductsByCategoryName, createProductCard, exportProductsToCsv }
+    const { id } = req.params;
+    const productToUpdate = req.body;
+    const file = req.file;
+
+    const oldProduct = await Product.findById(id);
+    if (!oldProduct) {
+      console.log("Producto no encontrado");
+      return res.status(404).json({ message: "Producto no encontrado" });
+    }
+
+    // Eliminar imagen antigua si existe
+       if (oldProduct.img) {
+        deleteImgCloudinary(oldProduct.img);
+      }
+
+     // Si hay una nueva imagen, subimos la nueva a Cloudinary
+     if (file) {
+      const imgUrl = file.path;
+
+      const fileName = file.filename || file.originalname.split('.')[0];
+      const publicId = `bidi-bags/${fileName}`;
+    
+      // Sube la imagen a Cloudinary con un public ID definido
+      const result = await cloudinary.uploader.upload(imgUrl, {
+        folder: 'bidi-bags', // El folder base
+        public_id: fileName, // Elimina sufijos aleatorios
+        allowedFormats: ['jpg', 'png', 'jpeg', 'gif'],
+        overwrite: true,
+        invalidate: true
+      });
+    
+      productToUpdate.img = result.secure_url; // Guarda la URL segura
+      productToUpdate.public_id = result.public_id; // Guarda el public ID para borrarlo después
+    }
+
+      // Actualizo el producto con la nueva info y la imagen
+      const updatedProduct = await Product.findByIdAndUpdate(id, productToUpdate, { new: true }).lean();
+      if (!updatedProduct) {
+        return res.status(404).json({ message: "Prooducto no encontrado" });
+      }
+  
+      console.log('El producto se ha actualizado', updatedProduct);
+      return res.status(200).json({ success: true, product: updatedProduct });
+
+    } catch (error) {
+      console.error('Error al actualizar el producto', error);
+      return res.status(500).json({ error: 'Error al actualizar el producto' });
+    }
+};
+
+
+// BORRAR EL PRODUCTO
+const deleteProduct = async (req, res, next) => {
+  try {
+
+      const { id } = req.params;
+      const product = await Product.findByIdAndDelete(id);
+
+      if (!product) {
+          return res.status(404).json({ message: "Producto no encontrado" });
+      }
+      if (product && product.img) {
+        deleteImgCloudinary(product.img);
+        console.log("Foto eliminada de Cloudinary", product.img)
+      } 
+
+      return res.status(200).json({ 
+          message: '¡Producto borrado! Foto eliminada  de Cloudinary',
+          deletedEvent: product
+      });
+  } catch (error) {
+
+      return res.status(400).json({ message: 'Error al eliminar el producto', error: error.message });
+  }
+};
+
+
+
+module.exports = { 
+  getProducts, 
+  getProductById, 
+  getProductsByCategoryName, 
+  createProductCard, 
+  exportProductsToCsv, 
+  updateProductById,
+  deleteProduct
+}
   
   
