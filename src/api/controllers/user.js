@@ -105,7 +105,7 @@ const getUserById = async (req, res, next) => {
 // ACTUALIZAR USUARIO
 const updateUserById = async (req, res) => {
   try {
-    const { id } = req.params; // ID del usuario a actualizar
+    const { id } = req.params; // ID del user
     const updates = req.body; // Nuevos datos enviados en el body
     const { newPaymentMethod, shippingAddress, billingAddress } = updates; // Extraer campos específicos
 

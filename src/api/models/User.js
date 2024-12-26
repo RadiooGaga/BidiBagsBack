@@ -42,7 +42,7 @@ const userSchema = new mongoose.Schema(
     paymentMethods: [
       {
         paymentToken: { type: String }, 
-        // Token de pago proporcionado por el proveedor de pago (como Stripe)
+        // Token de pago proporcionado por el proveedor de pago (por ej. Stripe)
         cardHolderName: { type: String },
       },
     ],

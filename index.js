@@ -34,15 +34,15 @@ connectDB();
 app.use(express.json()); 
 
 
-
+/*
 const corsOptions = {
   origin: 'https://bidi-bags-front.vercel.app',
   methods: 'GET, POST, PUT, DELETE',
   allowedHeaders: 'Content-Type, Authorization',
 };
 
-app.use(cors(corsOptions));
-//app.use(cors())
+app.use(cors(corsOptions));*/
+app.use(cors())
 
 app.use('/', userRoutes);
 app.use('/', productRoutes)
