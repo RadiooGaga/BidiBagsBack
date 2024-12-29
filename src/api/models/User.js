@@ -19,6 +19,7 @@ const userSchema = new mongoose.Schema(
       minlength: [8, 'Password 8 characters minimum'],
     },
     favorites: { type: [String], trim: true, required: true },
+    cart: { type: [String], trim: true, required: true },
     rol: { type: String, enum: ["admin", "user"],  default: "user" },
 
     // Nuevos campos para dirección y forma de pago

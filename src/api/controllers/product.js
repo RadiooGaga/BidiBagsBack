@@ -57,15 +57,25 @@ const getProductsByCategoryName = async (req, res, next) => {
 // SUBIR PRODUCTO NUEVO
 const createProductCard = async (req, res, next) => {
   try {
-    const { categoryName, collectionName, price, inStock, description, details } = req.body;
+    const { categoryName, collectionName, price, description, details } = req.body;
     const file = req.file;
-   
-   //Verificar si inStock es un valor booleano
-  const inStockValue = req.body.inStock === 'true' || req.body.inStock === true;
 
-    if (!file) {
-      return res.status(400).json({ message: 'Por favor, sube una imagen para el producto' });
-    }
+      // Validar que los campos obligatorios estén presentes
+      if (!categoryName || !collectionName || !price || !description || !details) {
+        return res.status(400).json({ 
+          success: false,
+          message: 'Todos los campos obligatorios deben ser completados.' 
+        });
+      }
+
+      if (!file) {
+        return res.status(400).json({ 
+          success:false,
+          message: 'Por favor, sube una imagen para el producto' });
+      }
+
+    //Verificar si inStock es un valor booleano
+    const inStockValue = req.body.inStock === 'true' || req.body.inStock === true;
      
     // Crear un nuevo producto
     const newProduct = new Product({
@@ -81,12 +91,14 @@ const createProductCard = async (req, res, next) => {
     const productDB = await newProduct.save(); // Guardado del producto en la base de datos
     console.log('Producto creado con éxito!');
     return res.status(201).json({ 
+      success: true,
       product: productDB, 
       message: "PRODUCTO SUBIDO!" });
 
   } catch (error) {
     console.log("Error al crear el producto:", error);
     return res.status(500).json({ 
+      success: false,
       message: 'Hubo un error al crear el producto', 
       error: error.message });
   }
@@ -162,7 +174,7 @@ const updateProductById = async (req, res, next) => {
       // Actualizo el producto con la nueva info y la imagen
       const updatedProduct = await Product.findByIdAndUpdate(id, productToUpdate, { new: true }).lean();
       if (!updatedProduct) {
-        return res.status(404).json({ message: "Prooducto no encontrado" });
+        return res.status(404).json({ success: false, message: "Producto no encontrado" });
       }
   
       console.log('El producto se ha actualizado', updatedProduct);
@@ -170,7 +182,7 @@ const updateProductById = async (req, res, next) => {
 
     } catch (error) {
       console.error('Error al actualizar el producto', error);
-      return res.status(500).json({ error: 'Error al actualizar el producto' });
+      return res.status(500).json({  success: false, error: 'Error al actualizar el producto' });
     }
 };
 
@@ -183,7 +195,9 @@ const deleteProduct = async (req, res, next) => {
       const product = await Product.findByIdAndDelete(id);
 
       if (!product) {
-          return res.status(404).json({ message: "Producto no encontrado" });
+          return res.status(404).json({ 
+            success: false,
+            message: "Producto no encontrado" });
       }
       if (product && product.img) {
         deleteImgCloudinary(product.img);
@@ -191,12 +205,16 @@ const deleteProduct = async (req, res, next) => {
       } 
 
       return res.status(200).json({ 
-          message: '¡Producto borrado! Foto eliminada  de Cloudinary',
+          success: true,
+          message: '¡Producto borrado!',
           deletedEvent: product
       });
   } catch (error) {
 
-      return res.status(400).json({ message: 'Error al eliminar el producto', error: error.message });
+      return res.status(400).json({ 
+        success: false,
+        message: 'Error al eliminar el producto', 
+        error: error.message });
   }
 };
 

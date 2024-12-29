@@ -12,6 +12,7 @@ const register = async (req, res, next) => {
         email: req.body.email,
         password: req.body.password,
         favorites: req.body.favorites,
+        cart: req.body.cart,
         rol: "user",   
     });
 
@@ -92,7 +93,8 @@ const getUserById = async (req, res, next) => {
     try {
       const { id } = req.params;
       const user = await User.findById(id)
-      .populate('favorites')
+      //.populate('favorites')
+      //.populate('cart')
       console.log(user)
       return res.status(200).json(user);
     } catch (error) {
@@ -105,7 +107,7 @@ const getUserById = async (req, res, next) => {
 // ACTUALIZAR USUARIO
 const updateUserById = async (req, res) => {
   try {
-    const { id } = req.params; // ID del user
+    const { id } = req.params; 
     const updates = req.body; // Nuevos datos enviados en el body
     const { newPaymentMethod, shippingAddress, billingAddress } = updates; // Extraer campos específicos
 
@@ -114,16 +116,20 @@ const updateUserById = async (req, res) => {
       return res.status(403).json({ message: "No puedes modificar a otro usuario" });
     }
 
-    // Buscar el usuario original
+    // usuario original
     const oldUser = await User.findById(id);
 
     if (!oldUser) {
       return res.status(404).json({ message: "Usuario no encontrado" });
     }
 
-    // Si la contraseña ha sido modificada, re-hacer el hash
-    if (updates.password) {
+     // Solo modificar la contraseña si se proporciona una nueva
+     if (updates.password && updates.password !== oldUser.password) {
+      // Si hay una nueva contraseña, hacer un hash
       updates.password = await bcrypt.hash(updates.password, 10);
+    } else {
+      // Si no se proporciona una nueva contraseña, eliminar el campo `password` de la actualización
+      delete updates.password;
     }
 
     //console.log("Body recibido en la solicitud:", updates);
@@ -137,11 +143,27 @@ const updateUserById = async (req, res) => {
         .filter((id) => !favoritesToRemove.includes(id.toString())) // Eliminar favoritos
         .concat(favoritesToAdd.filter((id) => !oldUser.favorites.includes(id))); // Añadir nuevos sin duplicados
 
-        // Filtrar duplicados, en caso de que alguna lógica añada favoritos repetidos
-        const uniqueFavorites = [...new Set(updatedFavorites)];
+      // Filtrar duplicados, en caso de que alguna lógica añada favoritos repetidos
+      const uniqueFavorites = [...new Set(updatedFavorites)];
 
         updates.favorites = uniqueFavorites; //lista filtrada y sin duplicados
-      console.log('Favoritos actualizados:', uniqueFavorites);
+        console.log('Favoritos actualizados:', uniqueFavorites);
+
+    }
+    
+    if (updates.productsToAdd || updates.productsToRemove) {
+      const productsToAdd = updates.productsToAdd || [];
+      const productsToRemove = updates.productsToRemove || [];
+
+      const updatedCart = oldUser.cart
+        .filter((id) => !productsToRemove.includes(id.toString())) // Eliminar productos del carrito
+        .concat(productsToAdd.filter((id) => !oldUser.cart.includes(id))); // Añadir nuevos sin duplicados
+
+      // Filtrar duplicados, en caso de que alguna lógica añada productos repetidos en el carrito
+      const productsInCart = [...new Set(updatedCart)];
+
+        updates.cart = productsInCart; //lista filtrada y sin duplicados
+        console.log('Productos del carrito actualizados:', productsInCart);
 
     }
 
@@ -157,7 +179,6 @@ const updateUserById = async (req, res) => {
     if (shippingAddress) {
       updateOperations.$set.shippingAddress = shippingAddress;
     }
-
     if (billingAddress) {
       updateOperations.$set.billingAddress = billingAddress;
     }

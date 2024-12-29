@@ -165,7 +165,9 @@ const deleteCategory = async (req, res, next) => {
       const category = await Category.findByIdAndDelete(id);
 
       if (!category) {
-          return res.status(404).json({ message: "categoría no encontrada" });
+          return res.status(404).json({ 
+            success:false,
+            message: "categoría no encontrada" });
       }
       if (category && category.img) {
         deleteImgCloudinary(category.img);
@@ -173,12 +175,15 @@ const deleteCategory = async (req, res, next) => {
       } 
 
       return res.status(200).json({ 
-          message: '¡Categoría borrada! Foto eliminada  de Cloudinary',
+        success: true,
+          message: '¡Categoría borrada!',
           deletedCategory: category
       });
   } catch (error) {
-
-      return res.status(400).json({ message: 'Error al eliminar la categoría', error: error.message });
+      return res.status(400).json({
+        success: false, 
+        message: 'Error al eliminar la categoría', 
+        error: error.message });
   }
 };
   
