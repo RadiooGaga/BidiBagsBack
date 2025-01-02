@@ -206,30 +206,54 @@ const updateUserById = async (req, res) => {
 
 //BORRAR USUARIO (ADMIN)
 const deleteUserById = async (req, res, next) => {
-    try {
-        const { id } = req.params;
-        const { user } = req;
-  
-        // Verifica si el usuario autenticado está intentando eliminar su propia cuenta
-        if (user._id.toString() !== id) {
-            return res.status(403).json({ message: "No puedes eliminar una cuenta que no sea la tuya" });
-        }
-        const userToDelete = await User.findByIdAndDelete(id);
-     
-        if (!userToDelete) {
-            console.log("Usuario no encontrado");
-            return res.status(404).json({ message: "Usuario no encontrado" });
-        }
-  
-        return res.status(200).json({
-            message: "¡Usuario borrado!",
-            userToDelete,
-        });
-      
-    } catch (error) {
-        console.error("Error al eliminar el usuario", error);
-        return res.status(400).json({ message: "Error al eliminar el usuario", error });
-    }
+  try {
+      const { id } = req.params; 
+      const { user } = req; 
+
+      const userToDelete = await User.findById(id);
+
+      if (!userToDelete) {
+          console.log("Usuario no encontrado");
+          return res.status(404).json({ 
+            success: false, 
+            message: "Usuario no encontrado" 
+          });
+      }
+
+      // Verificar permisos según el rol
+      if (user.rol === 'user') {
+          // Un usersolo puede eliminarse a sí mismo
+          if (user._id.toString() !== id) {
+              return res.status(403).json({ 
+                success: false, 
+                message: "No puedes eliminar cuentas que no sean la tuya" 
+              });
+          }
+      } else if (user.rol !== 'admin') {
+          // Denegar acceso si el rol no es válido
+          return res.status(403).json({ 
+            success: false, 
+            message: "No tienes permisos para realizar esta acción" 
+          });
+      }
+
+      // Eliminar al usuario
+      await User.findByIdAndDelete(id);
+
+      return res.status(200).json({
+          success: true,
+          message: "¡Usuario borrado con éxito!",
+          user: userToDelete,
+      });
+
+  } catch (error) {
+      console.error("Error al eliminar el usuario", error);
+      return res.status(400).json({ 
+        success: false, 
+        message: "Error al eliminar el usuario", 
+        error 
+      });
+  }
 };
 
   

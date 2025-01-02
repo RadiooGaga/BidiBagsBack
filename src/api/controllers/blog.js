@@ -30,7 +30,9 @@ const createBlogPost = async (req, res, next) => {
       const file = req.file;
 
       if (!file) {
-        return res.status(400).json({ message: 'Por favor, sube una imagen para el post' });
+        return res.status(400).json({ 
+          success:false,
+          message: 'Por favor, sube una imagen para el post' });
       }
 
     const newPost = new Post({
@@ -49,7 +51,11 @@ const createBlogPost = async (req, res, next) => {
       
     } catch (error) {
       console.log("error al crear el post");
-      return res.status(400).json(error);
+      return res.status(400).json({
+        success:false,
+        message: "error al crear el post",
+        error
+      });
     }
 }
 

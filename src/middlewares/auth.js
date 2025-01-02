@@ -8,7 +8,10 @@ const isAdmin = async (req, res, next) => {
         const token = req.headers.authorization;
 
         if (!token) {
-            return res.status(401).json({ error: "No estás autorizado, no hay token" });
+            return res.status(401).json({ 
+                success: false,
+                message: "No autorizado: falta el token" ,
+                error: "No estás autorizado, no hay token" });
         }
 
         const parsedToken = token.replace("Bearer ", "");
@@ -16,7 +19,11 @@ const isAdmin = async (req, res, next) => {
         const user = await User.findById(id);
 
         if (!user) {
-            return res.status(404).json("Usuario no encontrado");
+            return res.status(404).json({
+                success: false, 
+                message: "Usuario no encontrado", 
+                error: "Usuario no encontrado"
+            });
         }
 
         // Verificar el rol del usuario
@@ -29,11 +36,19 @@ const isAdmin = async (req, res, next) => {
             req.user = user;
             next();
         } else {
-            return res.status(400).json("Rol de usuario desconocido");
+            return res.status(403).json({
+                success: false, 
+                message: "Acceso denegado: no eres admin",
+                error: "Acceso denegado: no eres admin"
+            });
         }
         
     } catch (error) {
-        return res.status(400).json("No estás autorizado");
+        return res.status(400).json({
+            success: false, 
+            message: "Error al procesar la solicitud", 
+            error: error.message 
+        });
     }
 }
 

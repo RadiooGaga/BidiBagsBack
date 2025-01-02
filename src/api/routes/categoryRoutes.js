@@ -13,11 +13,11 @@ const {
 } = require("../controllers/category");
 
 
-categoryRoutes.post("/create-category", upload.single('img'), createCategory);
 categoryRoutes.get("/categories", getCategories);
 categoryRoutes.get('/category/:id', getCategoryById);
+categoryRoutes.post("/create-category",  [isAdmin], upload.single('img'), createCategory);
 categoryRoutes.get('/categories/export/csv', [isAdmin], exportCategoriesToCsv);
-categoryRoutes.patch('/update-category/:id', upload.single('img'), updateCategoryById);
-categoryRoutes.delete('/delete-category/:id', deleteCategory);
+categoryRoutes.patch('/update-category/:id', [isAdmin], upload.single('img'), updateCategoryById);
+categoryRoutes.delete('/delete-category/:id',[isAdmin], deleteCategory);
 
 module.exports =  categoryRoutes;
