@@ -9,10 +9,12 @@ const {
     getProducts, 
     getProductById, 
     getProductsByCategoryName, 
+    getProductsByCollectionName,
     createProductCard,
     exportProductsToCsv,
     updateProductById,
-    deleteProduct
+    deleteProduct,
+
 
 } = require('../controllers/product');
 
@@ -20,6 +22,7 @@ const {
 productRoutes.get("/products", getProducts);
 productRoutes.get("/products/:id", getProductById);
 productRoutes.get("/products/category/:categoryName", getProductsByCategoryName);
+productRoutes.get("/products/collection/:collectionName", getProductsByCollectionName)
 productRoutes.post("/create-product", [isAdmin], upload.single('img'), createProductCard);
 productRoutes.get('/products/export/csv', [isAdmin], exportProductsToCsv);
 productRoutes.patch('/update-product/:id', [isAdmin], upload.single('img'), updateProductById);

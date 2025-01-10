@@ -19,7 +19,9 @@ const getProducts = async (req, res, next) => {
 const getProductById = async (req, res, next) => {
     try {
       const { id } = req.params;
-      const product = await Product.findById(id);
+      const product = await Product.findById(id)
+      .populate("category")
+      .populate("collection");
       console.log("id del producto", id);
       return res.status(200).json(product);
     } catch (error) {
@@ -51,6 +53,34 @@ const getProductsByCategoryName = async (req, res, next) => {
       return res.status(500).json({ message: "Error interno del servidor" });
     }
 }
+
+
+
+// TRAER PRODUCTOS POR COLECCIÓN
+const getProductsByCollectionName = async (req, res, next) => {
+  try {
+    const { collectionName } = req.params;
+    const cleanedCollection = collectionName.trim(); 
+    const products = await Product.find({
+      collectionName: new RegExp(`^${cleanedCollection}$`, "i") 
+      // Coincidencia exacta e insensible a mayúsculas/minúsculas
+  });
+
+    if (products.length < 0) {
+      return res.status(404).json({ message: "No se encontraron productos para esta coleccion" });
+    }
+
+    console.log("tus productos por coleccion");
+    return res.status(200).json(products);
+
+  } catch (error) {
+    console.error("Error al obtener productos por colección:", error);
+    return res.status(500).json({ message: "Error interno del servidor" });
+  }
+}
+
+
+
 
 
 
@@ -223,7 +253,8 @@ const deleteProduct = async (req, res, next) => {
 module.exports = { 
   getProducts, 
   getProductById, 
-  getProductsByCategoryName, 
+  getProductsByCategoryName,
+  getProductsByCollectionName, 
   createProductCard, 
   exportProductsToCsv, 
   updateProductById,

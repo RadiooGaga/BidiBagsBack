@@ -9,6 +9,7 @@ const cors = require('cors');
 const userRoutes = require('./src/api/routes/userRoutes');
 const productRoutes = require('./src/api/routes/productRoutes')
 const categoryRoutes = require('./src/api/routes/categoryRoutes');
+const collectionRoutes = require('./src/api/routes/collectionRoutes');
 const blogRoutes = require('./src/api/routes/blogRoutes');
 
 
@@ -47,6 +48,7 @@ app.use(cors(corsOptions));
 app.use('/', userRoutes);
 app.use('/', productRoutes)
 app.use('/', categoryRoutes);
+app.use('/', collectionRoutes);
 app.use('/', blogRoutes);
 
 
