@@ -11,7 +11,7 @@ const categorySchema = new mongoose.Schema(
     categoryName: { type: String, unique: true, required: true },
     img: { type: String, required: true },
     visible: { type: Boolean },
-    /*products: [{ type: mongoose.Schema.Types.ObjectId, ref: "BidiProducts" }] */
+    products: [{ type: mongoose.Schema.Types.ObjectId, ref: "BidiProducts" }] 
     
   },
   {

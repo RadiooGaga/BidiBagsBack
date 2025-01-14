@@ -11,7 +11,7 @@ const collectionSchema = new mongoose.Schema(
     collectionName: { type: String, unique: true, required: true },
     img: { type: String, required: true },
     visible: { type: Boolean },
-    /*products: [{ type: mongoose.Schema.Types.ObjectId, ref: "BidiProducts" }] */
+    products: [{ type: mongoose.Schema.Types.ObjectId, ref: "BidiProducts" }] 
     
   },
   {

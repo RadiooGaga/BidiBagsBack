@@ -3,6 +3,7 @@ const cloudinary = require('cloudinary').v2
 const { CloudinaryStorage } = require('multer-storage-cloudinary')
 
 //subir la foto
+/*
 const uploadImage = async (imgUrl) => {
   try {
     const result = await cloudinary.uploader.upload(imgUrl, {
@@ -15,7 +16,7 @@ const uploadImage = async (imgUrl) => {
   } catch (error) {
     throw new Error('Error uploading image: ' + error.message);
   }
-};
+};*/
 
 /*
 // Almacenar las fotos en Cloudinary
@@ -46,7 +47,7 @@ const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
       folder: 'bidi-bags',
-      allowed_formats: ['jpg', 'png', 'jpeg', 'gif'],
+      allowed_formats: ['jpg', 'png', 'jpeg', 'gif', 'webp'],
       overwrite: true,
       invalidate: true 
     }
@@ -77,4 +78,4 @@ const deleteImgCloudinary = async (imgUrl) => {
 
 
 const upload = multer({ storage });
-module.exports = { upload, uploadImage, deleteImgCloudinary }
+module.exports = { upload, /*uploadImage,*/ deleteImgCloudinary }

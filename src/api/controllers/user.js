@@ -116,7 +116,6 @@ const updateUserById = async (req, res) => {
 
     // usuario original
     const oldUser = await User.findById(id);
-
     if (!oldUser) {
       return res.status(404).json({ message: "Usuario no encontrado" });
     }
@@ -186,7 +185,8 @@ const updateUserById = async (req, res) => {
       id,
       updateOperations,
       { new: true, runValidators: true } // Opciones para devolver el usuario actualizado y validar datos
-    ).populate('favorites');
+    ).populate('favorites')
+    .populate('cart');
 
     if (!userUpdated) {
       return res.status(404).json({ message: "No se pudo actualizar el usuario" });
