@@ -30,47 +30,48 @@ const getCollectionById = async (req, res, next) => {
 
 
 //CREAR COLECCIÓN
-const createCollection = async (req, res, next) => {
-    try {
-      const { collectionName, visible } = req.body;
-      const file = req.file;
+const createCollection= async (req, res, next) => {
+  try {
+    const { collectionName, visible } = req.body;
+    const file = req.file;
 
-      if (!file) {
-        return res.status(400).json({ 
-          success: false, 
-          error: true, 
-          message: 'Por favor, sube una imagen para la colección' });
-      }
-
-       //Verificar si visible es un valor booleano
-      const visibleState = req.body.visible === 'true' || req.body.visible === true;
-
-    const existingCollection = await Collection.findOne({ collectionName });
-    if (existingCollection) {
-      console.log("La colección ya existe");
-      return res.status(409).json({ 
+    if (!file) {
+      return res.status(400).json({ 
         success: false, 
         error: true, 
-        message: "La colección ya existe" }); 
+        message: 'Por favor, sube una imagen para la colección' });
     }
 
-    const newCollection = new Collection({
-      collectionName,
-      img: file.path,  // Guarda la URL de la imagen en cloudinary
-      visible: visibleState
+     //Verificar si visible es un valor booleano
+    const visibleState = req.body.visible === 'true' || req.body.visible === true;
+    const lowerCollectionName = collectionName.toLowerCase();
+
+  const existingCollection = await Collection.findOne({ collectionName: lowerCollectionName });
+  if (existingCollection) {
+    console.log("La colección ya existe");
+    return res.status(409).json({ 
+      success: false, 
+      error: true, 
+      message: "La colección ya existe" }); 
+  }
+
+  const newCollection = new Collection({
+    collectionName: lowerCollectionName,
+    img: file.path,  // Guarda la URL de la imagen en cloudinary
+    visible: visibleState
+  });
+
+    const ccollectionDB = await newCollection.save();
+    console.log('Colección creada con éxito y guardada en la DB!!')
+    return res.status(201).json({ 
+      collectionName: ccollectionDB, 
+      success: true
     });
-
-      const collectionDB = await newCollection.save();
-      console.log('Colección creada con éxito y guardada en la DB!!')
-      return res.status(201).json({ 
-        collectionName: collectionDB, 
-        success: true
-      });
-      
-    } catch (error) {
-      console.log("error al crear la colección");
-      return res.status(400).json({ success: false, error: true });
-    }
+    
+  } catch (error) {
+    console.log("error al crear la colección");
+    return res.status(400).json({ success: false, error: true });
+  }
 }
 
 
@@ -103,7 +104,7 @@ const exportCollectionsToCsv = async (req, res) => {
 
 
 
-// ACTUALIZAR CATEGORÍA
+// ACTUALIZAR COLECCIÓN
 const updateCollectionById = async (req, res, next) => {
   try {
 

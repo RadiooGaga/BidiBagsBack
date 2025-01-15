@@ -10,9 +10,8 @@ const categorySchema = new mongoose.Schema(
   {
     categoryName: { type: String, unique: true, required: true },
     img: { type: String, required: true },
-    visible: { type: Boolean },
-    products: [{ type: mongoose.Schema.Types.ObjectId, ref: "BidiProducts" }] 
-    
+    visible: { type: Boolean, default: true },
+    products: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }] 
   },
   {
     timestamps: true,
@@ -21,13 +20,13 @@ const categorySchema = new mongoose.Schema(
   
 );
 
-// Middleware para convertir el título a mayúsculas antes de guardar
+// Middleware para convertir el título a minúsculas antes de guardar
 categorySchema.pre('save', function (next) {
-  if (this.category) {
-    this.category = this.category.toUpperCase(); 
+  if (this.categoryName) {
+    this.categoryName = this.categoryName.toLowerCase(); 
   }
   next();
 });
 
-const Category = mongoose.model("Categories", categorySchema, "Categories");
+const Category = mongoose.model("Category", categorySchema, "Categories");
 module.exports = Category;

@@ -1,6 +1,9 @@
 const { deleteImgCloudinary } = require('../../middlewares/cloudinary');
 const cloudinary = require('cloudinary').v2
 const Product = require('../models/Product');
+const Category = require('../models/Category');
+const Collection = require('../models/Collection');
+
 
 // TRAER PRODUCTOS
 const getProducts = async (req, res, next) => {
@@ -20,8 +23,6 @@ const getProductById = async (req, res, next) => {
     try {
       const { id } = req.params;
       const product = await Product.findById(id)
-      .populate("category")
-      .populate("collection");
       console.log("id del producto", id);
       return res.status(200).json(product);
     } catch (error) {
@@ -29,6 +30,28 @@ const getProductById = async (req, res, next) => {
       return res.status(400).json(error);
     }
 };
+
+
+// TRAER PRODUCTOS POR ID DE LA CATEGORÍA
+const getProductsByCategoryId = async (req, res, next) => {
+  try {
+    const { categoryId} = req.params;
+    const products = await Product.find({ categoryId });
+
+    if (products.length < 0) {
+      return res.status(404).json({ message: "No se encontraron productos para esta categoría" });
+    }
+
+    console.log("tus productos por categoría");
+    return res.status(200).json(products);
+
+  } catch (error) {
+    console.error("Error al obtener productos por categoría:", error);
+    return res.status(500).json({ message: "Error interno del servidor" });
+  }
+}
+
+
 
 
 // TRAER PRODUCTOS POR CATEGORÍA
@@ -81,20 +104,18 @@ const getProductsByCollectionName = async (req, res, next) => {
 
 
 
-
-
-
 // SUBIR PRODUCTO NUEVO
 const createProductCard = async (req, res, next) => {
   try {
-    const { categoryName, collectionName, price, description, details } = req.body;
+    const { categoryId, collectionId, price, description, details, inStock } = req.body;
     const file = req.file;
 
-      // Validar que los campos obligatorios estén presentes
-      if (!categoryName || !collectionName || !price || !description || !details) {
-        return res.status(400).json({ 
+
+       // Validar que los campos obligatorios estén presentes
+       if (!categoryId || !collectionId || !price || !description || !details) {
+        return res.status(400).json({
           success: false,
-          message: 'Todos los campos obligatorios deben ser completados.' 
+          message: 'Todos los campos obligatorios deben ser completados.'
         });
       }
 
@@ -106,33 +127,51 @@ const createProductCard = async (req, res, next) => {
 
     //Verificar si inStock es un valor booleano
     const inStockValue = req.body.inStock === 'true' || req.body.inStock === true;
+
+        // Obtener los nombres de la categoría y la colección usando los ObjectId
+        const category = await Category.findById(categoryId);
+        const collection = await Collection.findById(collectionId);
+    
+        if (!category || !collection) {
+          return res.status(404).json({
+            success: false,
+            message: 'Categoría o colección no encontrada'
+          });
+        }
      
-    // Crear un nuevo producto
+  
+    // Crear un nuevo producto con los datos y las relaciones correctas
     const newProduct = new Product({
-      categoryName,
-      collectionName,
-      img: file.path,  // Guarda la URL de la imagen en cloudinary
+      categoryId, 
+      collectionId, 
+      categoryName: category.categoryName, 
+      collectionName: collection.collectionName,  
+      img: file.path, // Guarda la URL de la imagen
       price,
-      inStock: inStockValue,  // Almacena el valor booleano
+      inStock: inStockValue, // Almacena el valor booleano
       description,
       details,
     });
 
-    const productDB = await newProduct.save(); // Guardado del producto en la base de datos
-    console.log('Producto creado con éxito!');
-    return res.status(201).json({ 
+    // Guardar el nuevo producto en la base de datos
+    const productDB = await newProduct.save();
+    console.log('Producto creado con éxito!', productDB);
+    return res.status(201).json({
       success: true,
-      product: productDB, 
-      message: "PRODUCTO SUBIDO!" });
+      product: productDB,
+      message: "PRODUCTO SUBIDO!"
+    });
 
   } catch (error) {
     console.log("Error al crear el producto:", error);
-    return res.status(500).json({ 
+    return res.status(500).json({
       success: false,
-      message: 'Hubo un error al crear el producto', 
-      error: error.message });
+      message: 'Hubo un error al crear el producto',
+      error: error.message
+    });
   }
 };
+
 
 
 
@@ -253,6 +292,7 @@ const deleteProduct = async (req, res, next) => {
 module.exports = { 
   getProducts, 
   getProductById, 
+  getProductsByCategoryId,
   getProductsByCategoryName,
   getProductsByCollectionName, 
   createProductCard, 

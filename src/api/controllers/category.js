@@ -19,7 +19,7 @@ const getCategories = async (req, res, next) => {
 const getCategoryById = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const category = await Category.findById(id)
+    const category = await Category.findById(id);
     console.log(category)
     return res.status(200).json(category);
   } catch (error) {
@@ -43,8 +43,9 @@ const createCategory = async (req, res, next) => {
 
        //Verificar si visible es un valor booleano
       const visibleState = req.body.visible === 'true' || req.body.visible === true;
+      const lowerCategoryName = categoryName.toLowerCase();
 
-    const existingCategory = await Category.findOne({ categoryName });
+    const existingCategory = await Category.findOne({ categoryName: lowerCategoryName });
     if (existingCategory) {
       console.log("La categoría ya existe");
       return res.status(409).json({ 
@@ -54,7 +55,7 @@ const createCategory = async (req, res, next) => {
     }
 
     const newCategory = new Category({
-      categoryName,
+      categoryName: lowerCategoryName,
       img: file.path,  // Guarda la URL de la imagen en cloudinary
       visible: visibleState
     });

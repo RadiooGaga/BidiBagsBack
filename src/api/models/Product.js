@@ -8,8 +8,10 @@ mongoose.set('strictPopulate', false);*/
 
 const productSchema = new mongoose.Schema(
   {
-    categoryName: { type: String, ref: "Category", required: true },
-    collectionName: { type: String, ref: "Collection", required: true },
+    categoryId: { type: mongoose.Schema.Types.ObjectId, ref: "Category", required: true },
+    collectionId: { type: mongoose.Schema.Types.ObjectId, ref: "Collection", required: true },
+    categoryName: { type: String, required: true }, 
+    collectionName: { type: String, required: true }, 
     img: { type: String, required: true },
     price: { type: Number, required: true },
     inStock: { type: Boolean, required: true },
@@ -25,5 +27,5 @@ const productSchema = new mongoose.Schema(
   }
 );
 
-const Product = mongoose.model("BidiProducts", productSchema, "BidiProducts");
+const Product = mongoose.model("Product", productSchema, "BidiProducts");
 module.exports = Product;

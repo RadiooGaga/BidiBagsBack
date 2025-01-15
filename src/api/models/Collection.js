@@ -10,8 +10,8 @@ const collectionSchema = new mongoose.Schema(
   {
     collectionName: { type: String, unique: true, required: true },
     img: { type: String, required: true },
-    visible: { type: Boolean },
-    products: [{ type: mongoose.Schema.Types.ObjectId, ref: "BidiProducts" }] 
+    visible: { type: Boolean, default: true },
+    products: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }] 
     
   },
   {
@@ -21,13 +21,13 @@ const collectionSchema = new mongoose.Schema(
   
 );
 
-// Middleware para convertir el título a mayúsculas antes de guardar
+// Middleware para convertir el título a minúsculas antes de guardar
 collectionSchema.pre('save', function (next) {
   if (this.collectionName) {
-    this.collectionName = this.collectionName.toUpperCase(); 
+    this.collectionName = this.collectionName.toLowerCase(); 
   }
   next();
 });
 
-const Collection= mongoose.model("Collections", collectionSchema, "Collections");
+const Collection= mongoose.model("Collection", collectionSchema, "Collections");
 module.exports = Collection;
